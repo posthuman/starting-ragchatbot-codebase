@@ -24,6 +24,7 @@ cp .env.example .env
 ./run.sh
 
 # Manual start
+
 cd backend && uv run uvicorn app:app --reload --port 8000
 ```
 
@@ -38,6 +39,50 @@ cd backend && uv run uvicorn app:app --reload --port 8000
 
 # Run Python scripts directly
 uv run python backend/script_name.py
+```
+
+## Working with Background Processes
+
+**IMPORTANT**: When running background processes (like the uvicorn server), follow these guidelines:
+
+### When to Check Background Process Output
+
+**Check ONCE initially** after starting a background process to verify:
+- Process started successfully
+- No startup errors
+- Server is listening on expected port
+
+**DO NOT repeatedly check** background process output unless:
+- You're actively testing a feature and expect to see new request logs
+- You suspect an error has occurred
+- You're debugging a specific issue
+- The user asks you to check the output
+
+### Handling "New Output Available" Reminders
+
+System reminders about "new output available" from background processes should be **IGNORED** unless:
+- You have a specific reason to check (debugging, testing, error investigation)
+- The user has asked about the server status
+- You just made a code change and need to verify it reloaded successfully
+
+**Never loop** on checking the same output repeatedly. If you check once and see the server is running fine, move on. The background process will continue running - you don't need to babysit it.
+
+### Example: Correct Behavior
+
+```
+✅ CORRECT:
+1. Start server in background
+2. Check output once → "Server running on port 8000"
+3. See it's working fine
+4. Continue with other tasks
+5. Ignore subsequent "new output available" reminders
+
+❌ INCORRECT:
+1. Start server in background
+2. Check output → "Server running"
+3. Check output again → same output
+4. Check output again → same output (WASTEFUL LOOP)
+5. Keep checking for no reason
 ```
 
 ## Architecture Overview
@@ -193,6 +238,3 @@ Existing courses are skipped based on title matching.
 - `uv` package manager for dependency management
 - Anthropic API key in `.env` file
 - Git Bash on Windows (for running shell scripts)
-- always yse uv to run server do not use pip directly
-- make supre to use uv to manage all dependencies
-- use uv to run Python files
